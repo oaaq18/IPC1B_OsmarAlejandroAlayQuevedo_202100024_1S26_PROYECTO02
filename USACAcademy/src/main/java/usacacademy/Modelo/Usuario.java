@@ -121,21 +121,37 @@ public abstract  class Usuario implements Serializable{
             seccionesAsignadas++;
         }
         public void decrementarSecciones(){
-            if (true) {
-                
-            }
-            seccionesAsignadas--;
+            if (seccionesAsignadas>0) {
+               seccionesAsignadas--; 
+            } 
         }
         
     }
     //ESTUDIANTE
       public static class Estudiante extends Usuario{
+        private int cursosInscritos;
         public Estudiante(String codigo, String nombre, String password, String fechaNacimiento, String genero){
             super(codigo, nombre, password, fechaNacimiento, genero, "ESTUDIANTE");
+            this.cursosInscritos=0;
         }
         @Override
         public String getTipoUsuario(){
             return "ESTUDIANTE";
+        }
+
+        public int getCursosInscritos() {
+            return cursosInscritos;
+        }
+        public void setCursosInscritos(int n) {
+            this.cursosInscritos = n;
+        }
+        public void incrementarCursos(){
+          cursosInscritos++;
+        }
+        public void decrementarCursos(){
+            if (cursosInscritos>0) {
+                cursosInscritos--;
+            }
         }
     }
     
