@@ -67,4 +67,55 @@ public class AppControlador {
         }
         return null; //credenciales incorrectas
     }
+     
+     public synchronized int getInscripcionesPendientes(){
+        return inscripcionesPendientes.size();
+    }
+     
+     public synchronized inscripcion procesarInscripcion()  {
+        if(inscripcionesPendientes.size() > 0) {
+            inscripcion ins = inscripcionesPendientes.obtener(0);
+            inscripcionesPendientes.eliminar(0);
+            return ins;
+        }
+        return null;
+    }
+        public void cargarCSV(String path) {
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String line;
+            boolean firstLine = true;
+            while ((line = br.readLine()) != null) {
+                if (firstLine) { // Saltar header si existe
+                    firstLine = false;
+                    continue;
+                }
+                String[] parts = line.split(",");
+                if (parts.length >= 3) {
+                    //String nombreEstudiante, 
+                    //String codigoEstudiante, 
+                    //String codigoSeccion, /
+                    //String codigoCurso, String fecha, String semestre
+                    String nombreEstudiante = parts[0].trim();
+                    String codigoEstudiante = parts[1].trim();
+                    String codgigoSeccion = parts[2].trim();
+                    String codigoCurso = parts[3].trim();
+                    String fecha = parts[4].trim();
+                    String Semestre = parts[5].trim();
+                    synchronized (this) {
+                        inscripcionesPendientes.agregar(new inscripcion(nombreEstudiante, 
+                                                            codigoEstudiante, 
+                                                            codgigoSeccion,
+                                                            codigoCurso,
+                                                            fecha,
+                                                            Semestre   ));
+                                                                
+                    }
+                }
+            }
+            JOptionPane.showMessageDialog(null, "CSV cargado exitosamente.");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error al cargar CSV: " + e.getMessage());
+        }
+    }
+      
 }
