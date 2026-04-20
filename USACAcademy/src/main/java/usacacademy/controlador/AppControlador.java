@@ -100,7 +100,7 @@ public class AppControlador {
         }
     }
      /*------------AUTENTICACION ------------------------------------
-     buscar el usuario por codigo y validar contrase;a, retorna el objeto usuario si coincide y nill si no   
+     buscar el usuario por codigo y validar contrase;a, retorna el objeto usuario si coincide y null si no   
      */
      public Usuario autenticar(String usuario, String password){
         for (int i = 0; i < usuarios.size(); i++) {
@@ -113,9 +113,12 @@ public class AppControlador {
         }
         return null; //credenciales incorrectas
     }
+    
      
-     //---------------CRUD DE USUARIOS----------------------------------
-    //------------------------------------------------------------------
+    /*
+    ---------------------CRUD DE USUARIOS-----------------------------------------------------------------
+    */
+     
     //metodo que devuelve la lsita de los usuarios
      public listaSimple<Usuario> getUsuarios() { return usuarios; }
      //metodo para agregar usuario
@@ -131,6 +134,7 @@ public class AppControlador {
         guardarUsuarios();
         return true;
     }
+    
     //buscar usuario mediante si codigo y retornar el usuario si es econtrado o null en caso contrario
     public Usuario buscarUsuario(String codigo) {
         for (int i = 0; i < usuarios.size(); i++) {
@@ -139,6 +143,7 @@ public class AppControlador {
         }
         return null;
     }
+    
     //metodo para aclizar nombre o contrase;a de un usuario, retorna true si se actualizo o false si no se econtro
     public boolean actualizarUsuario(String codigo, String nuevoNombre, String nuevaPassword) {
         Usuario u = buscarUsuario(codigo);
@@ -164,11 +169,191 @@ public class AppControlador {
         JOptionPane.showMessageDialog(null, "Usuario no encontrado.");
         return false;
     }
-    //---------------FIN CRUD DE USUARIOS----------------------------------
-    //------------------------------------------------------------------
+    /*
+    ---------------FIN CRUD DE USUARIOS-----------------------------------------------------------------
+    */
     
-    //---------------CRUD DE CURSOS----------------------------------
-    //------------------------------------------------------------------
+       /*
+    ------------------ INICIO CRUD NOTAS ----------------------------------------------------------
+    */
+    
+
+    public listaSimple<Nota> getNotas() {
+        return notas; 
+    }
+    //verificar si un estidante ya cuenta con un curso con x etiqueta
+    private boolean validarEtiqueta(String codigoSeccion,String codigoEstudiante, String etiqueta) {
+        for (int i = 0; i < notas.size(); i++) {
+            Nota n = notas.obtener(i);
+            if (n.getCodigoSeccion().equals(codigoSeccion) && n.getCodigoEstudiante().equals(codigoEstudiante)
+                    && n.getEtiqueta().equals(etiqueta)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public boolean agregarNota(Nota nota, String codigoInstructor) {
+        //validar que la sección exista
+        Seccion seccion = buscarSeccion(nota.getCodigoSeccion());
+        if (seccion == null) {
+            JOptionPane.showMessageDialog(null, "ERROR: Seccion no encontrada.");
+            return false;
+        }
+        //validar que el instructor tenga asignada la sección
+        if (!seccion.getCodigoInstructor().equals(codigoInstructor)) {
+            JOptionPane.showMessageDialog(null, "ERROR: No tienes asignada esta seccion");
+            return false;
+        }
+        //validar que el estudiante esté inscrito
+        if (!seccion.estaInscrito(nota.getCodigoEstudiante())) {
+            JOptionPane.showMessageDialog(null, "ERROR: El estudiante no esta inscrito en esta seccion");
+            return false;
+        }
+        //validar rango de nota 0-100
+        if (nota.getValor() < 0 || nota.getValor() > 100) {
+            JOptionPane.showMessageDialog(null, "ERROR: Nota fuera de rango");
+            return false;
+        }
+        //validar ponderacion mayor a 0
+        if (nota.getPonderacion() <= 0) {
+            JOptionPane.showMessageDialog(null, "EEROR: La ponderacion debe ser mayor a 0");
+            return false;
+        }
+        // Validar que no haya duplicado de etiqueta para ese estudiante en esa sección
+        if (validarEtiqueta(nota.getCodigoSeccion(), nota.getCodigoEstudiante(), nota.getEtiqueta())) {
+            JOptionPane.showMessageDialog(null, "ERROR: El estduiante ya cuenta un curso con esta etiqueta");
+            return false;
+        }
+        notas.agregar(nota);
+        guardarNotas();
+        return true;
+    }
+    //metodo para actualizar nota
+     public boolean actualizarNota(String codigoSeccion, String codigoEstudiante, String etiqueta, double nuevoPonderacion, double nuevoValor) {
+        for (int i = 0; i < notas.size(); i++) {
+            Nota n = notas.obtener(i);
+            if (n.getCodigoSeccion().equals(codigoSeccion)
+                    && n.getCodigoEstudiante().equals(codigoEstudiante)
+                    && n.getEtiqueta().equals(etiqueta)) {
+                if (nuevoPonderacion > 0)  n.setPonderacion(nuevoPonderacion);
+                if (nuevoValor >= 0 && nuevoValor <= 100) n.setValor(nuevoValor);
+                guardarNotas();
+                return true;
+            }
+        }
+        JOptionPane.showMessageDialog(null, "Nota no encontrada.");
+        return false;
+    }
+    //METODO PARA ELIMINAR NOTA
+      public boolean eliminarNota(String codigoSeccion,
+            String codigoEstudiante, String etiqueta) {
+        for (int i = 0; i < notas.size(); i++) {
+            Nota n = notas.obtener(i);
+            if (n.getCodigoSeccion().equals(codigoSeccion)
+                    && n.getCodigoEstudiante().equals(codigoEstudiante)
+                    && n.getEtiqueta().equals(etiqueta)) {
+                notas.eliminar(i);
+                guardarNotas();
+                return true;
+            }
+        }
+        JOptionPane.showMessageDialog(null, "Nota no encontrada.");
+        return false;
+    }
+    //METODO PARA CALCULAR PROMEDIO DE NOTAS: 
+    public double calcularPromedio(String codigoSeccion, String codigoEstudiante) {
+        double sumaAportes     = 0;
+        double sumaPonderacion = 0;
+        
+        for (int i = 0; i < notas.size(); i++) {
+            Nota n = notas.obtener(i);
+            if (n.getCodigoSeccion().equals(codigoSeccion)
+                    && n.getCodigoEstudiante().equals(codigoEstudiante)) {
+                sumaAportes     += n.getNotaPonderacion();
+                sumaPonderacion += n.getPonderacion();
+            }
+        }
+        if (sumaPonderacion == 0) return 0;
+        return sumaAportes / sumaPonderacion;
+    }
+    /*
+    ------------------ FIN CRUD NOTAS ----------------------------------------------------------
+    */
+    /*
+    ------------------ INICIO CRUD SECCIONES ----------------------------------------------------------
+    */
+    //metodo para devolver lista de secciones 
+    public listaSimple<Seccion> getSEcciones(){
+        return secciones;
+    }
+    //metodo para buscar seccion mediante codigo
+    public Seccion buscarSeccion(String codigo){
+        for (int i = 0; i < secciones.size(); i++) {
+            Seccion s = secciones.obtener(i);
+            if (s.getCodigo().equals(codigo)) {
+                return s;
+            }
+        }
+        return null;
+    }
+    
+    //metodo para agregar nueva seccion
+    public boolean agregarSeccion(Seccion seccion){
+        if (buscarCurso(seccion.getCodigo())!=null) {
+            JOptionPane.showMessageDialog(null, "ERROR: El codigo de seccion "+seccion.getCodigo() + " ya exixte");
+            return false;
+        }
+        //CASO VERDADERO, CODIGO DISPONIBLE
+        secciones.agregar(seccion);
+        guardarSecciones();
+        return true;
+    }
+    //metodo para actualizar seccion
+    public boolean actualizarSeccion(String codigo, String nuevoInstructor,String nuevoSemestre,String nuevoHorario, int nuevosCupos){
+        Seccion s=buscarSeccion(codigo);
+        if(s==null){
+        JOptionPane.showConfirmDialog(null, "ERROR: Seccion no econtrada");
+        return false;
+        }
+        //CASO VERDADERO: modifica segun los parametros recibidos
+        if(nuevoInstructor!=null && !nuevoInstructor.isEmpty()){
+            s.setCodigoInstructor(nuevoInstructor);
+        }
+        if (nuevoSemestre!=null && !nuevoSemestre.isBlank()){
+            s.setSemestre(nuevoSemestre);
+        }
+        if (nuevoHorario!=null && !nuevoHorario.isEmpty()) {
+            s.setHorario(nuevoHorario);
+        }
+        if(nuevosCupos>0){
+            s.setCupos(nuevosCupos);
+        }
+        guardarSecciones();
+        return true;
+    }
+    //metodo para eliminar seccion
+    public boolean eliminarSeccion(String codigo){
+        for (int i = 0; i < secciones.size(); i++) {
+            if (secciones.obtener(i).getCodigo().equals(codigo)) {
+                secciones.eliminar(i);
+                return true;
+            }
+            
+        }
+        //CASO FALSO: no se econtro
+        JOptionPane.showMessageDialog(null, "ERROR: no se econtro la seccion");
+        return false;
+    }
+    
+    /*
+    ------------------ FIN CRUD SECCIONES ----------------------------------------------------------
+    */
+    
+    /*
+    ------------------ INICIO CRUD CURSOS ----------------------------------------------------------
+    */
+    
     //metodo para retornar lista de los codigos
      public listaSimple<Curso> getCursos() { return cursos; }
      
@@ -176,7 +361,7 @@ public class AppControlador {
         public boolean agregarCurso(Curso curso) {
         if (buscarCurso(curso.getCodigo()) != null) {
             JOptionPane.showMessageDialog(null,
-                "El código de curso " + curso.getCodigo() + " ya existe.");
+                "El codigo de curso " + curso.getCodigo() + " ya existe.");
             return false;
         }
         cursos.agregar(curso);
@@ -220,9 +405,24 @@ public class AppControlador {
         return false;
     }
     
-    //---------------FIN CRUD DE USUARIOS----------------------------------
-    //------------------------------------------------------------------
-    
+    /*
+    ------------------ FIN CRUD CURSOS ----------------------------------------------------------
+    */
+    //---------------------------HILOS-----------------------------------------------------------
+    //--------------------------HILOS INSCRIPCIONES---------------------------------------------
+    public synchronized int getInscripcionesPendientes()
+    {
+        return inscripcionesPendientes.size();
+    }
+         public synchronized inscripcion procesarInscripcion()  {
+        if(inscripcionesPendientes.size() > 0) {
+            inscripcion ins = inscripcionesPendientes.obtener(0);
+            inscripcionesPendientes.eliminar(0);
+            return ins;
+        }
+        return null;
+    }
+
     
      //------------------------------------------------------------------
     //-----------------CARGAR ARCHIVOS-----------------------------------
@@ -310,18 +510,8 @@ public class AppControlador {
       
 
  
-     public synchronized int getInscripcionesPendientes(){
-        return inscripcionesPendientes.size();
-    }
      
-     public synchronized inscripcion procesarInscripcion()  {
-        if(inscripcionesPendientes.size() > 0) {
-            inscripcion ins = inscripcionesPendientes.obtener(0);
-            inscripcionesPendientes.eliminar(0);
-            return ins;
-        }
-        return null;
-    }
+
         public void cargarCSV(String path) {
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;

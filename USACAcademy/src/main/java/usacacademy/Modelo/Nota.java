@@ -6,7 +6,7 @@ public class Nota implements Serializable{
     private String codigoCurso;       // curso al que pertenece
     private String codigoSeccion;     // seccion a la que pertenece
     private String codigoEstudiante;  // estudiante al que pertenece la nota
-    private String etiqueta;          // parcial, tarea, parcial
+    private String etiqueta;          // parcial, tarea, hoja 
     private double ponderacion;       // 
     private double valor;             // nota de 0 a 100
     private String fecha;   
