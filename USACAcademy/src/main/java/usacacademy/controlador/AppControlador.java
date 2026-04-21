@@ -549,5 +549,31 @@ public class AppControlador {
             JOptionPane.showMessageDialog(null, "Error al cargar CSV: " + e.getMessage());
         }
     }
+        //para los hilos 
+            public synchronized int getUsuariosActivos() {
+        int count = 0;
+        for (int i = 0; i < usuarios.size(); i++) {
+            // instructores y estudiantes (no el admin)
+            if (!(usuarios.obtener(i) instanceof Usuario.Administrador)) {
+                count++;
+            }
+        }
+        return count;
+    }
+ 
+    /**
+     * Retorna la cantidad de estudiantes registrados.
+     * Usado por hiloEstadistica.
+     */
+    public synchronized int getEstudiantesCount() {
+        int count = 0;
+        for (int i = 0; i < usuarios.size(); i++) {
+            if (usuarios.obtener(i) instanceof Usuario.Estudiante) {
+                count++;
+            }
+        }
+        return count;
+    }
+ 
       
 }

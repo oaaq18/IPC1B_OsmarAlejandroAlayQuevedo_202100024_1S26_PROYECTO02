@@ -3,8 +3,10 @@ usacacademy/Modelo/Seccion.class
 usacacademy/Modelo/Usuario$Instructor.class
 usacacademy/Modelo/Usuario$Administrador.class
 usacacademy/vista/VistaPrincipal.class
+usacacademy/Modelo/HiloEstadisticas.class
 usacacademy/Modelo/Usuario.class
 usacacademy/USACAcademy.class
+usacacademy/Modelo/HiloSesiones.class
 usacacademy/Modelo/inscripcion.class
 usacacademy/Modelo/Usuario$Estudiante.class
 usacacademy/Modelo/HiloInscripcion.class
