@@ -1,8 +1,12 @@
 /home/alejandro/Documentos/IPC1_2026/Proyecto 02/USACAcademy/src/main/java/usacacademy/Modelo/Curso.java
 /home/alejandro/Documentos/IPC1_2026/Proyecto 02/USACAcademy/src/main/java/usacacademy/Modelo/HiloInscripcion.java
+/home/alejandro/Documentos/IPC1_2026/Proyecto 02/USACAcademy/src/main/java/usacacademy/Modelo/Nota.java
 /home/alejandro/Documentos/IPC1_2026/Proyecto 02/USACAcademy/src/main/java/usacacademy/Modelo/Seccion.java
 /home/alejandro/Documentos/IPC1_2026/Proyecto 02/USACAcademy/src/main/java/usacacademy/Modelo/Usuario.java
 /home/alejandro/Documentos/IPC1_2026/Proyecto 02/USACAcademy/src/main/java/usacacademy/Modelo/inscripcion.java
 /home/alejandro/Documentos/IPC1_2026/Proyecto 02/USACAcademy/src/main/java/usacacademy/Modelo/listaSimple.java
 /home/alejandro/Documentos/IPC1_2026/Proyecto 02/USACAcademy/src/main/java/usacacademy/USACAcademy.java
 /home/alejandro/Documentos/IPC1_2026/Proyecto 02/USACAcademy/src/main/java/usacacademy/controlador/AppControlador.java
+/home/alejandro/Documentos/IPC1_2026/Proyecto 02/USACAcademy/src/main/java/usacacademy/vista/PanelAdministrador.java
+/home/alejandro/Documentos/IPC1_2026/Proyecto 02/USACAcademy/src/main/java/usacacademy/vista/PanelLogin.java
+/home/alejandro/Documentos/IPC1_2026/Proyecto 02/USACAcademy/src/main/java/usacacademy/vista/VistaPrincipal.java

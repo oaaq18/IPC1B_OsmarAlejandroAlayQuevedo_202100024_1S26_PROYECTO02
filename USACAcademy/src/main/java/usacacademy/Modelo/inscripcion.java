@@ -18,6 +18,11 @@ public class inscripcion implements Serializable{
     }
     //----GETTERS
 
+    public String getNombreEstudiante() {
+        return nombreEstudiante;
+    }
+    
+
     public String getCodigoEstudiante() {
         return codigoEstudiante;
     }
