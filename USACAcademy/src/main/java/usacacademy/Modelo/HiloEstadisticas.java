@@ -28,7 +28,7 @@ public class HiloEstadisticas implements Runnable{
                 int cantidad   = controlador.getUsuariosActivos();
                 String ts      = sdf.format(new Date());
                 String mensaje = "[Thread-Sesiones] Usuarios Activos: " + cantidad
-                               + " - Última actividad: [" + ts + "]\n";
+                               + " - Ultima actividad: [" + ts + "]\n";
  
                 SwingUtilities.invokeLater(() -> {
                     areaConsola.append(mensaje);
