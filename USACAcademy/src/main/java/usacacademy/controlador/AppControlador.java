@@ -45,7 +45,7 @@ public class AppControlador {
         //usuario admin
         if(usuarios.size() == 0)
         {
-            usuarios.agregar(new Usuario.Administrador("202100024", "admin", "password","18/09/2000","H"));
+            usuarios.agregar(new Usuario.Administrador("admin", "NombreAdmin", "IPC1B","18/09/2000","H"));
         }
     }
     
@@ -559,6 +559,38 @@ public class AppControlador {
             }
         }
         return count;
+    }
+            //para panel instructor
+    public void cargarNotasCSV(String path, String codigoInstructor) {
+        int cargados = 0, errores = 0;
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String linea;
+            boolean primera = true;
+            while ((linea = br.readLine()) != null) {
+                if (primera) { primera = false; continue; } // saltar header
+                String[] p = linea.split(",");
+                if (p.length < 6) { errores++; continue; }
+                String curso      = p[0].trim();
+                String seccion    = p[1].trim();
+                String estudiante = p[2].trim();
+                String etiqueta   = p[3].trim(); // ej: Parcial1, Tarea2
+                double ponderacion, nota;
+                try {
+                    ponderacion = Double.parseDouble(p[4].trim());
+                    nota        = Double.parseDouble(p[5].trim());
+                } catch (NumberFormatException ex) { errores++; continue; }
+                String fecha = p.length > 6 ? p[6].trim() : "";
+                boolean ok = agregarNota(
+                    new Nota(curso, seccion, estudiante, etiqueta, ponderacion, nota, fecha),
+                    codigoInstructor
+                );
+                if (ok) cargados++; else errores++;
+            }
+            JOptionPane.showMessageDialog(null,
+                "CSV notas cargado: " + cargados + " exitosos, " + errores + " errores");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error al leer CSV: " + e.getMessage());
+            }
     }
  
     /**

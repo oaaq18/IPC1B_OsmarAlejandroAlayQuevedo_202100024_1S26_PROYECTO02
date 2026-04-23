@@ -67,12 +67,15 @@ public class PanelLogin extends JPanel{
             if(usuario instanceof Usuario.Administrador) {
                 JOptionPane.showMessageDialog(this, "Usuario Administrador");
                 ventanaPrincipal.cambiarVista("Administrador");
-
+            }else if (usuario instanceof Usuario.Instructor){
+            JOptionPane.showMessageDialog(this, "Usuario Instructor");
+            ventanaPrincipal.setUsuarioActual(usuario);
+            ventanaPrincipal.cambiarVista("Instructor");
+        }
             
-            }
         }else {
             //manejo de errores visuales
-            JOptionPane.showMessageDialog(this, "Código o contraseña incorrectos");
+            JOptionPane.showMessageDialog(this, "Codigo o contraseña incorrectos");
         }
     }
     

@@ -14,11 +14,11 @@ import javax.swing.table.DefaultTableModel;
 /**
  * Panel principal del Administrador
  * Organizado con JTabbedPane
- *   1. Instructores (CRUD + CSV)
- *   2. Estudiantes (CRUD + CSV)
- *   3. Cursos       CRUD + CSV)
- *   4. Secciones     (CRUD)
- *   5. Monitor   (3 hilos en tiempo real)
+ *   1. Instructores CRUD + CSV
+ *   2. Estudiantes CRUD + CSV
+ *   3. Cursos       CRUD + CSV
+ *   4. Secciones    CRUD
+ *   5. Monitor  3 hilos en tiempo real
  */
 
 public class PanelAdministrador extends JPanel{
@@ -146,7 +146,7 @@ public class PanelAdministrador extends JPanel{
         tablaInstructores.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         panel.add(new JScrollPane(tablaInstructores), BorderLayout.CENTER);
         //form
-        JPanel form = new JPanel(new GridLayout(0, 2, 6, 6));
+        JPanel form = new JPanel(new GridLayout(0, 2, 6, 6));//sirve para alinear los texfield
         form.setBorder(BorderFactory.createTitledBorder("Gestion de Instructores"));
  
         JTextField txtCodigo  = new JTextField();
@@ -162,7 +162,7 @@ public class PanelAdministrador extends JPanel{
         form.add(new JLabel("Contrasena:"));  form.add(txtPass);
         
         //botones
-        JPanel botones = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        JPanel botones = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));//sirve para colocarlos con continuidad
         JButton btnAgregar   = new JButton("Agregar");
         JButton btnActualizar = new JButton("Actualizar");
         JButton btnEliminar  = new JButton("Eliminar");
@@ -301,7 +301,7 @@ public class PanelAdministrador extends JPanel{
         panel.add(sur, BorderLayout.SOUTH);
  
         cargarTablaUsuarios(modeloEstudiantes, "ESTUDIANTE");
- 
+        //LLENAR LOS TEXFLIED CON EL CONTENIDO DE LA TABLA
         tablaEstudiantes.getSelectionModel().addListSelectionListener(e -> {
             int fila = tablaEstudiantes.getSelectedRow();
             if (fila < 0) return;
@@ -412,7 +412,7 @@ public class PanelAdministrador extends JPanel{
         panel.add(sur, BorderLayout.SOUTH);
  
         cargarTablaCursos();
- 
+        //LLENAR LOS TEXFLIED CON EL CONTENIDO DE LA TABLA
         tablaCursos.getSelectionModel().addListSelectionListener(e -> {
             int fila = tablaCursos.getSelectedRow();
             if (fila < 0) return;
@@ -541,7 +541,7 @@ public class PanelAdministrador extends JPanel{
         panel.add(sur, BorderLayout.SOUTH);
  
         cargarTablaSecciones();
- 
+        //LLENAR LOS TEXFLIED CON EL CONTENIDO DE LA TABLA
         tablaSecciones.getSelectionModel().addListSelectionListener(e -> {
             int fila = tablaSecciones.getSelectedRow();
             if (fila < 0) return;
@@ -742,15 +742,7 @@ public class PanelAdministrador extends JPanel{
         }
     }
  
-    //aplica color a un boto
-    private void colorearBoton(JButton btn, Color color) {
-        btn.setBackground(color);
-        btn.setForeground(Color.WHITE);
-        btn.setFocusPainted(false);
-        btn.setOpaque(true);
-        btn.setBorderPainted(false);
-    }
- 
+
     //Abre un JFileChooser y retorna la ruta del CSV seleccionado 
     private String elegirCSV() {
         JFileChooser fc = new JFileChooser();
