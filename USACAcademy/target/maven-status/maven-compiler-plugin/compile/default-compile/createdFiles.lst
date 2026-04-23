@@ -1,8 +1,10 @@
 usacacademy/Modelo/Usuario$Instructor.class
 usacacademy/Modelo/Usuario$Administrador.class
+usacacademy/vista/PanelEstudiante$3.class
 usacacademy/vista/VistaPrincipal.class
 usacacademy/vista/PanelInstructor$3.class
 usacacademy/vista/PanelAdministrador$1.class
+usacacademy/vista/PanelEstudiante$2.class
 usacacademy/Modelo/HiloSesiones.class
 usacacademy/vista/PanelAdministrador$4.class
 usacacademy/vista/PanelAdministrador$2.class
@@ -16,10 +18,12 @@ usacacademy/controlador/AppControlador.class
 usacacademy/Modelo/Nota.class
 usacacademy/Modelo/Seccion.class
 usacacademy/vista/PanelInstructor$2.class
+usacacademy/vista/PanelEstudiante.class
 usacacademy/Modelo/HiloEstadisticas.class
 usacacademy/Modelo/Usuario.class
 usacacademy/vista/PanelAdministrador$3.class
 usacacademy/USACAcademy.class
 usacacademy/Modelo/Usuario$Estudiante.class
 usacacademy/Modelo/HiloInscripcion.class
+usacacademy/vista/PanelEstudiante$1.class
 usacacademy/vista/PanelAdministrador.class

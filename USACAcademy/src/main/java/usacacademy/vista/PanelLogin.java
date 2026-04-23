@@ -64,13 +64,17 @@ public class PanelLogin extends JPanel{
 
         if(usuario != null) {
             //redireccion según el rol
-            if(usuario instanceof Usuario.Administrador) {
-                JOptionPane.showMessageDialog(this, "Usuario Administrador");
-                ventanaPrincipal.cambiarVista("Administrador");
-            }else if (usuario instanceof Usuario.Instructor){
-            JOptionPane.showMessageDialog(this, "Usuario Instructor");
+        if(usuario instanceof Usuario.Administrador) {
+            JOptionPane.showMessageDialog(this, "Ingresando como administrador");
+            ventanaPrincipal.cambiarVista("Administrador");
+        }else if (usuario instanceof Usuario.Instructor){
+            JOptionPane.showMessageDialog(this, "Ingresando como instructor");
             ventanaPrincipal.setUsuarioActual(usuario);
             ventanaPrincipal.cambiarVista("Instructor");
+        }else if(usuario instanceof Usuario.Estudiante){
+            JOptionPane.showMessageDialog(this, "Ingresando como estudiante");
+            ventanaPrincipal.setUsuarioActual(usuario);
+            ventanaPrincipal.cambiarVista("Estudiante");
         }
             
         }else {

@@ -12,6 +12,7 @@ public class VistaPrincipal extends JFrame{
     private JPanel panelPrincipal;
     private PanelAdministrador panelAdministrador;
     private PanelInstructor panelInstructor; // variable de clase
+    private PanelEstudiante panelEstudiante;
     private Usuario usuarioActual; // guardar quien inicio sesion
   
     public VistaPrincipal() {
@@ -21,11 +22,13 @@ public class VistaPrincipal extends JFrame{
 
         panelAdministrador = new PanelAdministrador(this);
         panelInstructor    = new PanelInstructor(this); // asignar a la variable de clase
+        panelEstudiante = new PanelEstudiante(this);
         PanelLogin panelLogin = new PanelLogin(this);
 
-        panelPrincipal.add(panelLogin,         "Login");
+        panelPrincipal.add(panelLogin,  "Login");
         panelPrincipal.add(panelAdministrador, "Administrador");
-        panelPrincipal.add(panelInstructor,    "Instructor");
+        panelPrincipal.add(panelInstructor, "Instructor");
+        panelPrincipal.add(panelEstudiante, "Estudiante");
 
         add(panelPrincipal);
         pack();
@@ -40,6 +43,9 @@ public class VistaPrincipal extends JFrame{
         if ("Instructor".equals(nombreVista)) {
             // le pasa el instructor que inicio sesion
             panelInstructor.setInstructor((Usuario.Instructor) usuarioActual);
+        }
+        if("Estudiante".equals(nombreVista)){
+            panelEstudiante.setEstudiante((Usuario.Estudiante)usuarioActual);
         }
     }
     public void setUsuarioActual(Usuario usuario) {
