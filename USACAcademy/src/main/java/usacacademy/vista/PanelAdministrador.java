@@ -69,11 +69,10 @@ public class PanelAdministrador extends JPanel{
         //Botones de lado de abajo
         
         JPanel panelBotones = new JPanel();
-        JButton btnCargarCSV = new JButton("Cargar CSV");//boton
+
         JButton btnLogout = new JButton("Cerrar Sesion");//boton
-        btnLogout.setBackground(new Color(200, 50, 50)); // fondo rojo
-        btnLogout.setForeground(Color.WHITE);  //texto blanco
-        btnLogout.setFocusPainted(false); //quitar borde punteado
+        
+        
         //lo que hace el boton salir:
         btnLogout.addActionListener(e -> {
             detenerHilos();
@@ -83,20 +82,6 @@ public class PanelAdministrador extends JPanel{
  
         //Acción de cargar CSV
 
-            btnCargarCSV.addActionListener(e-> {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setDialogTitle("Seleccionar archivo CSV");
-            int result = fileChooser.showOpenDialog(this);
-            if (result == JFileChooser.APPROVE_OPTION) {
-                String path = fileChooser.getSelectedFile().getAbsolutePath();
-                ventanaPrincipal.getControlador().cargarCSV(path);
-                // Actualizar contador
-                String timeStamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
-                int actual = ventanaPrincipal.getControlador().getInscripcionesPendientes();
-                txtConsola.append("[Carga CSV] Inscripciones Pendientes: " + actual + " [" + timeStamp + "]\n");
-                txtConsola.setCaretPosition(txtConsola.getDocument().getLength());
-            }
-        });
 
         //Cerrar sesion y detener hilos
 
@@ -105,14 +90,10 @@ public class PanelAdministrador extends JPanel{
             ventanaPrincipal.cambiarVista("Login");
         });
 
-        panelBotones.add(btnCargarCSV);
         panelBotones.add(btnLogout);
         add(panelBotones, BorderLayout.SOUTH);
         //pestanas ----------------------
-        // ── Primero el UIManager ──────────────────────
-        UIManager.put("TabbedPane.foreground",         Color.GREEN);
-        UIManager.put("TabbedPane.selected",           new Color(240, 247, 240));
-        UIManager.put("TabbedPane.selectedForeground", Color.GREEN);
+
 
         // ── Luego crear el JTabbedPane ────────────────
         JTabbedPane tabs = new JTabbedPane();
@@ -125,6 +106,7 @@ public class PanelAdministrador extends JPanel{
         tabs.addTab("Cursos",          tablaCursos());
         tabs.addTab("Secciones",       tablaSecciones());
         tabs.addTab("Monitor",       crearTabMonitor());
+        tabs.addTab("Reportes",     reportes());
  
         add(tabs, BorderLayout.CENTER);
 
@@ -207,13 +189,10 @@ public class PanelAdministrador extends JPanel{
                 JOptionPane.showMessageDialog(this, "EEROR: Codigo, nombre y contraseña son obligatorios.");
                 return;
             }
-            boolean ok = controlador.agregarUsuario(
-                new Usuario.Instructor(cod, nom, pass, fec, gen));
-            if (ok) {
+            controlador.agregarUsuario(new Usuario.Instructor(cod, nom, pass, fec, gen));
                 JOptionPane.showMessageDialog(this, "Instructor registrado correctamente.");
                 cargarTablaUsuarios(modeloInstructores, "INSTRUCTOR");
                 limpiarCampos(txtCodigo, txtNombre, txtFecha, txtPass);
-            }
         });
  
         // ── ACTUALIZAR ───────────────────────────────────────────────
@@ -322,13 +301,11 @@ public class PanelAdministrador extends JPanel{
                 JOptionPane.showMessageDialog(this, "Codigo, nombre y contraseña son obligatorios.");
                 return;
             }
-            boolean ok = controlador.agregarUsuario(
-                new Usuario.Estudiante(cod, nom, pass, fec, gen));
-            if (ok) {
+            controlador.agregarUsuario(new Usuario.Estudiante(cod, nom, pass, fec, gen));
+            
                 JOptionPane.showMessageDialog(this, "Estudiante registrado correctamente.");
                 cargarTablaUsuarios(modeloEstudiantes, "ESTUDIANTE");
                 limpiarCampos(txtCodigo, txtNombre, txtFecha, txtPass);
-            }
         });
  
         btnActualizar.addActionListener(e -> {
@@ -438,12 +415,10 @@ public class PanelAdministrador extends JPanel{
                 JOptionPane.showMessageDialog(this, "Los créditos deben ser un número entero.");
                 return;
             }
-            boolean ok = controlador.agregarCurso(new Curso(cod, nom, desc, cred, sec));
-            if (ok) {
+                controlador.agregarCurso(new Curso(cod, nom, desc, cred, sec));
                 JOptionPane.showMessageDialog(this, "Curso registrado correctamente.");
                 cargarTablaCursos();
                 limpiarCampos(txtCodigo, txtNombre, txtDesc, txtCreditos, txtSeccion);
-            }
         });
  
         btnActualizar.addActionListener(e -> {
@@ -465,20 +440,16 @@ public class PanelAdministrador extends JPanel{
             JOptionPane.showMessageDialog(this, "Curso actualizado.");
             cargarTablaCursos();
         });
- 
+        ///eliminar
         btnEliminar.addActionListener(e -> {
+            Curso curso;
             String cod = txtCodigo.getText().trim();
             if (cod.isEmpty()) { JOptionPane.showMessageDialog(this, "Seleccione un curso."); return; }
-            int c = JOptionPane.showConfirmDialog(this, "¿Eliminar curso " + cod + "?",
-                    "confirmar eliminacion", JOptionPane.YES_NO_OPTION);
-            if (c == JOptionPane.YES_OPTION) {
-                boolean ok = controlador.eliminarCurso(cod);
-                if (ok) {
-                    JOptionPane.showMessageDialog(this, "curso eliminado.");
-                    cargarTablaCursos();
-                    limpiarCampos(txtCodigo, txtNombre, txtDesc, txtCreditos, txtSeccion);
-                }
-            }
+                controlador.eliminarCurso(cod);
+                JOptionPane.showMessageDialog(this, "curso eliminado.");
+                cargarTablaCursos();
+                limpiarCampos(txtCodigo, txtNombre, txtDesc, txtCreditos, txtSeccion);
+          
         });
  
         btnCSV.addActionListener(e -> {
@@ -525,7 +496,7 @@ public class PanelAdministrador extends JPanel{
         form.add(new JLabel("Horario:"));      form.add(txtHorario);
         form.add(new JLabel("Semestre:"));   form.add(txtSemestre);
         form.add(new JLabel("Cupos:"));  form.add(txtCupos);
- 
+        //botones
         JPanel botones = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
         JButton btnAgregar    = new JButton("Agregar");
         JButton btnActualizar = new JButton("Actualizar");
@@ -580,8 +551,8 @@ public class PanelAdministrador extends JPanel{
                 JOptionPane.showMessageDialog(this, "EEROR: los cupos deben ser un numero entero");
                 return;
             }
-            boolean ok = controlador.agregarSeccion(new Seccion(cod, cur, ins, hor, sem, cupos, null));
-            if (ok) {
+            controlador.agregarSeccion(new Seccion(cod, cur, ins, hor, sem, cupos, null));
+            
                 // Incrementar secciones del instructor si fue asignado
                 if (!ins.isEmpty()) {
                     Usuario u = controlador.buscarUsuario(ins);
@@ -589,7 +560,6 @@ public class PanelAdministrador extends JPanel{
                         ((Usuario.Instructor) u).incrementarSecciones();
                         controlador.guardarUsuarios();
                     }
-                }
                 JOptionPane.showMessageDialog(this, "Seccion registrada correctamente.");
                 cargarTablaSecciones();
                 limpiarCampos(txtCodigo, txtCurso, txtInstructor, txtHorario, txtSemestre, txtCupos);
@@ -617,17 +587,12 @@ public class PanelAdministrador extends JPanel{
  
         btnEliminar.addActionListener(e -> {
             String cod = txtCodigo.getText().trim();
-            if (cod.isEmpty()) { JOptionPane.showMessageDialog(this, "Seleccione una seccion."); return; }
-            int c = JOptionPane.showConfirmDialog(this, "¿Eliminar sección " + cod + "?",
-                    "Confirmar eliminacion", JOptionPane.YES_NO_OPTION);
-            if (c == JOptionPane.YES_OPTION) {
-                boolean ok = controlador.eliminarSeccion(cod);
-                if (ok) {
+            if (cod.isEmpty()) { JOptionPane.showMessageDialog(this, "Seleccione una seccion"); return; }
+                    controlador.eliminarSeccion(cod);
                     JOptionPane.showMessageDialog(this, "Seccion eliminada.");
                     cargarTablaSecciones();
                     limpiarCampos(txtCodigo, txtCurso, txtInstructor, txtHorario, txtSemestre, txtCupos);
-                }
-            }
+ 
         });
  
         btnLimpiar.addActionListener(e -> {
@@ -638,7 +603,6 @@ public class PanelAdministrador extends JPanel{
         return panel;
     }
     //----------------------------------------------HILOS-----------------------------------
-    
    private JPanel crearTabMonitor() {
         JPanel panel = new JPanel(new BorderLayout());
 
@@ -653,8 +617,79 @@ public class PanelAdministrador extends JPanel{
 
         return panel;
     }
+   //------------------------REPORTES
+   private JPanel reportes(){
+                JPanel panel = new JPanel(new BorderLayout(6, 6));
+         panel.setBorder(new EmptyBorder(8, 8, 8, 8));
+
+        // ===== PANEL REPORTES =====
+        JPanel botonesReportes = new JPanel(new GridLayout(2, 2, 10, 10));
+
+        JButton btnTopEstudiantes        = new JButton("Top estudiantes");
+        JButton btnBajoRendimiento      = new JButton("Bajo rendimiento");
+        JButton btnRendimientoSecciones = new JButton("Rendimiento por seccion");
+        JButton btnInscripcionesCurso   = new JButton("Inscripciones por curso");
+        JButton btnInscripcionesSem     = new JButton("Inscripciones por Semestre");
+        JButton btnHistorialEstudiante  = new JButton("Historial de estudiante");
+        JButton btnNotasSeccion         = new JButton("Notas por sección");
+        JButton btnReporteBitacora      = new JButton("Reporte bitacora");
+
+         // agregar al panel de reportes
+        botonesReportes.add(btnTopEstudiantes);
+        botonesReportes.add(btnBajoRendimiento);
+        botonesReportes.add(btnRendimientoSecciones);
+        botonesReportes.add(btnInscripcionesCurso);
+        botonesReportes.add(btnInscripcionesSem);
+        botonesReportes.add(btnHistorialEstudiante);
+        botonesReportes.add(btnNotasSeccion);
+        botonesReportes.add(btnReporteBitacora);
+
+         // ===== PANEL EXPORTACIONES =====
+        JPanel botonesExportaciones = new JPanel(new GridLayout(2, 2, 10, 10));
+
+        JButton btnExportarPDF = new JButton("Exportar PDF");
+        JButton btnExportarCSV = new JButton("Exportar CSV");
+        // agregar al panel de exportaciones
+        botonesExportaciones.add(btnExportarPDF);
+        botonesExportaciones.add(btnExportarCSV);
+
+        // ===== AGREGAR AL PANEL PRINCIPAL =====
+        panel.add(botonesReportes, BorderLayout.CENTER);
+        panel.add(botonesExportaciones, BorderLayout.SOUTH);
+        return panel;
+        //LISTENERS DE LOS BOTONES:
+  
         
-    public void iniciarHilos() {
+        btnTopEstudiantes.addActionListener(e -> {
+ 
+        });
+
+        btnBajoRendimiento.addActionListener(e -> {
+            
+        });
+
+        btnRendimientoSecciones.addActionListener(e -> {
+            
+        });
+
+        btnInscripcionesCurso.addActionListener(e -> {
+           
+        });
+
+        btnInscripcionesSem.addActionListener(e -> {
+            
+        });
+
+        btnHistorialEstudiante.addActionListener(e -> {
+           
+        });
+
+        btnNotasSeccion.addActionListener(e -> {
+           
+        });
+        
+   }
+   public void iniciarHilos() {
         if (txtConsola == null) return;
 
         txtConsola.setText("-----Iniciando monitor de hilos -----\n");

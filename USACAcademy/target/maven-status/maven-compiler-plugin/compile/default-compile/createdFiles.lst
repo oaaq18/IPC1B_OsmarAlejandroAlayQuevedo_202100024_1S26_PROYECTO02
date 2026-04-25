@@ -15,6 +15,7 @@ usacacademy/vista/PanelLogin.class
 usacacademy/vista/PanelInstructor.class
 usacacademy/Modelo/listaSimple.class
 usacacademy/controlador/AppControlador.class
+usacacademy/controlador/Reportes.class
 usacacademy/Modelo/Nota.class
 usacacademy/Modelo/Seccion.class
 usacacademy/vista/PanelInstructor$2.class

@@ -77,10 +77,10 @@ public class PanelEstudiante extends JPanel{
         // botones
         JPanel botones = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
         JButton btnInscribirse = new JButton("Inscribirse");
-        JButton btnRefrescar   = new JButton("Refrescar");
+        
  
         botones.add(btnInscribirse);
-        botones.add(btnRefrescar);
+      
         panel.add(botones, BorderLayout.SOUTH);
  
         // INSCRIBIRSE en la seccion seleccionada
@@ -120,8 +120,7 @@ public class PanelEstudiante extends JPanel{
             }
         });
  
-        // REFRESCAR la tabla de secciones disponibles
-        btnRefrescar.addActionListener(e -> cargarTablaDisponibles());
+
  
         return panel;
     }
@@ -142,10 +141,11 @@ public class PanelEstudiante extends JPanel{
         // botones
         JPanel botones = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
         JButton btnDesasignar = new JButton("Desasignarse");
-        JButton btnRefrescar  = new JButton("Refrescar");
- 
+        JButton btnRefrescar  = new JButton("Actualizar");
+        //acciones de botones
         botones.add(btnDesasignar);
         botones.add(btnRefrescar);
+        
         panel.add(botones, BorderLayout.SOUTH);
  
         // DESASIGNARSE de la seccion seleccionada
@@ -182,7 +182,7 @@ public class PanelEstudiante extends JPanel{
             }
         });
  
-        btnRefrescar.addActionListener(e -> cargarTablaMisInscripciones());
+        
  
         return panel;
     }

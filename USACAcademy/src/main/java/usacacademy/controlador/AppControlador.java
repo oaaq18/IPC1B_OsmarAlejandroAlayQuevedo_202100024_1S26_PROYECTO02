@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import javax.swing.JOptionPane;
-
 import usacacademy.Modelo.inscripcion;
 import usacacademy.Modelo.listaSimple;
 import usacacademy.Modelo.Usuario;
@@ -441,7 +440,7 @@ public class AppControlador {
                 String fecha    = p[2].trim();
                 String genero   = p[3].trim();
                 String password = p[4].trim();
-                // Validar que el código no esté duplicado
+                // Validar que el codigo no esté duplicado
                 if (buscarUsuario(codigo) != null) { errores++; continue; }
                 // Crear el usuario según el rol
                 if (rol.equals("INSTRUCTOR")) {
