@@ -39,11 +39,14 @@ public class Reportes {
         String fecha = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss").format(new Date());
         return fecha + "_" + tipoReporte + "." + extension;
     }
+    
     //------------------------------REPORTES PDF-------------------------------------------------
-     private void generarPDF(String titulo, String[] encabezados, listaSimple<String[]> filas, String ruta) {
+     private void generarPDF(String titulo, String[] encabezados, listaSimple<String[]> filas) {
+        String nombreArchivo = generarNombre("Reporte", "pdf");
         Document doc = new Document();
+        
         try {
-            PdfWriter.getInstance(doc, new FileOutputStream(ruta));
+            PdfWriter.getInstance(doc, new FileOutputStream(nombreArchivo));
             doc.open();
  
             // titulo del reporte
@@ -69,10 +72,58 @@ public class Reportes {
  
             doc.add(tabla);
             doc.close();
-            JOptionPane.showMessageDialog(null, "PDF generado correctamente:\n" + ruta);
+            JOptionPane.showMessageDialog(null, "PDF generado correctamente:");
  
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error al generar PDF: " + e.getMessage());
         }
     }
+     //GENERAR CSV
+      // metodo base para crear un CSV
+    private void generarCSV(String[] encabezados, listaSimple<String[]> filas) {
+      // genera el nombre con la fecha, se guarda donde corren los .ser
+      String nombreArchivo = generarNombre("REPORTE", "csv");
+      try (PrintWriter pw = new PrintWriter(new FileWriter(nombreArchivo))) {
+          pw.println(String.join(",", encabezados));
+          for (int i = 0; i < filas.size(); i++) {
+              pw.println(String.join(",", filas.obtener(i)));
+          }
+          JOptionPane.showMessageDialog(null, "CSV generado:\n" + nombreArchivo);
+      } catch (Exception e) {
+          JOptionPane.showMessageDialog(null, "Error al generar CSV: " + e.getMessage());
+      }
+  }
+    
+     //EStudiente individual: 
+       public void reporteIndividualEstudiante(String codEstudiante) {
+        String tipo = "ReporteEstudiante_" + codEstudiante;
+ 
+        Usuario u = controlador.buscarUsuario(codEstudiante);
+        if (u == null) {
+            JOptionPane.showMessageDialog(null, "Estudiante no encontrado.");
+            return;
+        }
+ 
+        String[] encabezados = {"Seccion", "Curso", "Semestre", "Promedio", "Estado"};
+        listaSimple<String[]> filas = new listaSimple<>();
+ 
+        listaSimple<Seccion> secciones = controlador.getSEcciones();
+        for (int i = 0; i < secciones.size(); i++) {
+            Seccion sec = secciones.obtener(i);
+            if (!sec.estaInscrito(codEstudiante)) continue;
+            double prom  = controlador.calcularPromedio(sec.getCodigo(), codEstudiante);
+            String estado = prom >= 61 ? "Aprobado" : "Reprobado";
+            filas.agregar(new String[]{
+                sec.getCodigo(), sec.getCodigoCurso(),
+                sec.getSemestre(), String.format("%.2f", prom), estado
+            });
+        }
+ 
+       String titulo = "Reporte Individual: " + u.getNombre() + " (" + codEstudiante + ")";
+       generarPDF(titulo, encabezados, filas);
+       generarCSV(encabezados, filas);
+    }
+ 
+     
+     
 }

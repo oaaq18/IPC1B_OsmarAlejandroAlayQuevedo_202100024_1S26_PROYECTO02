@@ -29,7 +29,7 @@ public class listaSimple<T> implements Serializable {
 
     public void eliminar(int indice) {
         if (indice < 0 || indice >= contador) {
-            throw new IndexOutOfBoundsException("Índice fuera de rango");
+            throw new IndexOutOfBoundsException("indice fuera de rango");
         }
         for (int i = indice; i < contador - 1; i++) {
             elementos[i] = elementos[i + 1];

@@ -11,6 +11,7 @@ import java.io.File;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+import usacacademy.controlador.Reportes;
 /**
  * Panel principal del Administrador
  * Organizado con JTabbedPane
@@ -100,7 +101,7 @@ public class PanelAdministrador extends JPanel{
         tabs.setFont(new Font("Tahoma", Font.BOLD, 13));
         tabs.setForeground(Color.GREEN);
         tabs.setOpaque(false);
-
+        
         tabs.addTab("‍🏫Instructores", tablaInstructores());
         tabs.addTab("Estudiantes",     tablaEstudiantes());
         tabs.addTab("Cursos",          tablaCursos());
@@ -619,13 +620,14 @@ public class PanelAdministrador extends JPanel{
     }
    //------------------------REPORTES
    private JPanel reportes(){
-                JPanel panel = new JPanel(new BorderLayout(6, 6));
+            Reportes reportes = new Reportes(controlador);
+         JPanel panel = new JPanel(new BorderLayout(6, 6));
          panel.setBorder(new EmptyBorder(8, 8, 8, 8));
 
         // ===== PANEL REPORTES =====
         JPanel botonesReportes = new JPanel(new GridLayout(2, 2, 10, 10));
 
-        JButton btnTopEstudiantes        = new JButton("Top estudiantes");
+        JButton btnTopEstudiantes       = new JButton("Top estudiantes");
         JButton btnBajoRendimiento      = new JButton("Bajo rendimiento");
         JButton btnRendimientoSecciones = new JButton("Rendimiento por seccion");
         JButton btnInscripcionesCurso   = new JButton("Inscripciones por curso");
@@ -656,7 +658,7 @@ public class PanelAdministrador extends JPanel{
         // ===== AGREGAR AL PANEL PRINCIPAL =====
         panel.add(botonesReportes, BorderLayout.CENTER);
         panel.add(botonesExportaciones, BorderLayout.SOUTH);
-        return panel;
+        
         //LISTENERS DE LOS BOTONES:
   
         
@@ -681,13 +683,15 @@ public class PanelAdministrador extends JPanel{
         });
 
         btnHistorialEstudiante.addActionListener(e -> {
-           
+        String cod = JOptionPane.showInputDialog(this, "Ingrese el codigo del estudiante:");
+            if (cod == null || cod.trim().isEmpty()){return;} 
+            reportes.reporteIndividualEstudiante(cod);
         });
 
         btnNotasSeccion.addActionListener(e -> {
            
         });
-        
+        return panel;
    }
    public void iniciarHilos() {
         if (txtConsola == null) return;
