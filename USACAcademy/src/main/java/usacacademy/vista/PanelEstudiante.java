@@ -10,6 +10,7 @@ import usacacademy.Modelo.Seccion;
 import usacacademy.Modelo.Usuario;
 import usacacademy.Modelo.listaSimple;
 import usacacademy.controlador.AppControlador;
+import usacacademy.controlador.Bitacora;
 import usacacademy.controlador.Reportes;
 
 public class PanelEstudiante extends JPanel{
@@ -100,11 +101,13 @@ public class PanelEstudiante extends JPanel{
             // validar que no este ya inscrito en esa seccion
             if (sec.estaInscrito(estudianteActual.getCodigo())) {
                 JOptionPane.showMessageDialog(this, "ERROR: ya esta incrito en esta seccion.");
+                Bitacora.registrar("ESTUDIANTE", estudianteActual.getCodigo(), "INSCRIBIRSE", "Ya estaba inscrito");
                 return;
             }
             // validar que haya cupos
             if (sec.getCupos() <= 0) {
                 JOptionPane.showMessageDialog(this, "ERROR: no hay cupos disponibles.");
+                Bitacora.registrar("ESTUDIANTE", estudianteActual.getCodigo(), "INSCRIBIRSE", "Sin cupos");
                 return;
             }
             // inscribir al estudiante en la seccion
@@ -114,15 +117,17 @@ public class PanelEstudiante extends JPanel{
                 controlador.guardarSecciones();
                 controlador.guardarUsuarios();
                 JOptionPane.showMessageDialog(this, "inscripcion exitosa en seccion " + codSeccion);
+                Bitacora.registrar("ESTUDIANTE", estudianteActual.getCodigo(), "INSCRIBIRSE", "Exito en " + codSeccion);
                 // refrescar tablas
                 cargarTablaDisponibles();
                 cargarTablaMisInscripciones();
             } else {
                 JOptionPane.showMessageDialog(this, "ERROR: No se pudo inscribir.");
+                Bitacora.registrar("ESTUDIANTE", estudianteActual.getCodigo(), "INSCRIBIRSE", "Fallo");
             }
         });
  
-
+            
  
         return panel;
     }
@@ -166,6 +171,7 @@ public class PanelEstudiante extends JPanel{
             // si tiene notas no se puede desasignar segun el enunciado
             if (tieneNotas(codSeccion, estudianteActual.getCodigo())) {
                 JOptionPane.showMessageDialog(this, "ERROR: No se puede desasignar, tiene notas registradas en esta seccion.");
+                Bitacora.registrar("ESTUDIANTE", estudianteActual.getCodigo(), "DESASIGNARSE", "Tiene notas");
                 return;
             }
             // desasignar al estudiante
@@ -175,15 +181,17 @@ public class PanelEstudiante extends JPanel{
                 controlador.guardarSecciones();
                 controlador.guardarUsuarios();
                 JOptionPane.showMessageDialog(this, "Desasignado correctamente de seccion " + codSeccion);
+                 Bitacora.registrar("ESTUDIANTE", estudianteActual.getCodigo(), "DESASIGNARSE", "Exito en " + codSeccion);
                 // refrescar tablas
                 cargarTablaDisponibles();
                 cargarTablaMisInscripciones();
                 cargarTablaNotas();
             } else {
                 JOptionPane.showMessageDialog(this, "ERROR: No se pudo desasignar.");
+                 Bitacora.registrar("ESTUDIANTE", estudianteActual.getCodigo(), "DESASIGNARSE", "Fallo");
             }
         });
- 
+        
         
  
         return panel;
@@ -211,12 +219,14 @@ public class PanelEstudiante extends JPanel{
         btnExportarCompleto.addActionListener(e -> {
             if (estudianteActual == null) return;
             reportes.reporteIndividualEstudiante(estudianteActual.getCodigo());
+            Bitacora.registrar("ESTUDIANTE", estudianteActual.getCodigo(), "EXPORTAR HISTORIAL", "Completo");
         });
         
         btnExportarSemestre.addActionListener(e -> {
             if (estudianteActual == null) return;
                 String sem = JOptionPane.showInputDialog(this, "Ingrese el semestre (1 o 2):");
             if (sem == null || sem.trim().isEmpty()) return;
+            Bitacora.registrar("ESTUDIANTE", estudianteActual.getCodigo(), "EXPORTAR HISTORIAL", "Semestre " + sem);
              reportes.reporteEstudiantePorSemestre(estudianteActual.getCodigo(), sem.trim());
         });
         panel.add(botones, BorderLayout.SOUTH);

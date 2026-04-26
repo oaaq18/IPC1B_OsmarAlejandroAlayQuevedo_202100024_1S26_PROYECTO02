@@ -12,6 +12,7 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfWriter;
+import java.io.BufferedReader;
  
 import usacacademy.Modelo.Curso;
 import usacacademy.Modelo.Nota;
@@ -24,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
@@ -239,6 +241,24 @@ public class Reportes {
         String titulo = "Historial Semestre " + semestre + ": " + u.getNombre();
         generarPDF(titulo, encabezados, filas, nombre+"REPORTE");
         generarCSV(encabezados, filas,nombre+"REPORTE");
+    }
+    public void reporteBitacora() {
+        String[] encabezados = {"Registro"};
+        listaSimple<String[]> filas = new listaSimple<>();
+
+        // leer el archivo bitacora.txt linea por linea
+        try (BufferedReader br = new BufferedReader(new FileReader("bitacora.txt"))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                filas.agregar(new String[]{linea});
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error al leer bitacora: " + e.getMessage());
+            return;
+        }
+
+        generarPDF("Reporte Bitacora del Sistema", encabezados, filas,"BITACORA");
+        generarCSV(encabezados, filas, "BITACORA");
     }
      
 }

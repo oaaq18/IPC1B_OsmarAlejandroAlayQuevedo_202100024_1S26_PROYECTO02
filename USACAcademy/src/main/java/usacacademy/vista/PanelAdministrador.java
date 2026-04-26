@@ -11,6 +11,7 @@ import java.io.File;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+import usacacademy.controlador.Bitacora;
 import usacacademy.controlador.Reportes;
 /**
  * Panel principal del Administrador
@@ -75,11 +76,12 @@ public class PanelAdministrador extends JPanel{
         
         
         //lo que hace el boton salir:
+       // ================== LOGOUT ==================
         btnLogout.addActionListener(e -> {
             detenerHilos();
-            ventanaPrincipal.cambiarVista("Login"); //regresa a login
+            Bitacora.registrar("ADMINISTRADOR", "ADMIN", "CERRAR SESION", "Sesion finalizada");
+            ventanaPrincipal.cambiarVista("Login");
         });
-
  
         //Acción de cargar CSV
 
@@ -179,51 +181,69 @@ public class PanelAdministrador extends JPanel{
         });
         
          // ── AGREGAR ──────────────────────────────────────────────────
+        // AGREGAR
         btnAgregar.addActionListener(e -> {
             String cod  = txtCodigo.getText().trim();
             String nom  = txtNombre.getText().trim();
             String fec  = txtFecha.getText().trim();
             String gen  = (String) cbGenero.getSelectedItem();
             String pass = new String(txtPass.getPassword()).trim();
- 
+
             if (cod.isEmpty() || nom.isEmpty() || pass.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "EEROR: Codigo, nombre y contraseña son obligatorios.");
+                Bitacora.registrar("ADMINISTRADOR", "ADMIN", "AGREGAR INSTRUCTOR", "Error datos incompletos");
                 return;
             }
+
             controlador.agregarUsuario(new Usuario.Instructor(cod, nom, pass, fec, gen));
-                JOptionPane.showMessageDialog(this, "Instructor registrado correctamente.");
-                cargarTablaUsuarios(modeloInstructores, "INSTRUCTOR");
-                limpiarCampos(txtCodigo, txtNombre, txtFecha, txtPass);
+            Bitacora.registrar("ADMINISTRADOR", "ADMIN", "AGREGAR INSTRUCTOR", "Instructor agregado correctamente");
+
+            JOptionPane.showMessageDialog(this, "Instructor registrado correctamente.");
+            cargarTablaUsuarios(modeloInstructores, "INSTRUCTOR");
+            limpiarCampos(txtCodigo, txtNombre, txtFecha, txtPass);
         });
  
-        // ── ACTUALIZAR ───────────────────────────────────────────────
+        // ACTUALIZAR
         btnActualizar.addActionListener(e -> {
             String cod  = txtCodigo.getText().trim();
             String nom  = txtNombre.getText().trim();
             String pass = new String(txtPass.getPassword()).trim();
-            if (cod.isEmpty()) { JOptionPane.showMessageDialog(this, "Seleccione o ingrese un codigo."); return; }
-            controlador.actualizarUsuario(cod, nom.isEmpty() ? null : nom, pass.isEmpty() ? null : pass);
+
+            if (cod.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Seleccione o ingrese un codigo.");
+                return;
+            }
+
+            controlador.actualizarUsuario(cod, nom.isEmpty()?null:nom, pass.isEmpty()?null:pass);
+            Bitacora.registrar("ADMINISTRADOR", "ADMIN", "ACTUALIZAR INSTRUCTOR", "Instructor actualizado");
+
             JOptionPane.showMessageDialog(this, "Instructor actualizado.");
             cargarTablaUsuarios(modeloInstructores, "INSTRUCTOR");
-            
         });
- 
-        // ── ELIMINAR ─────────────────────────────────────────────────
+
+        // ELIMINAR
         btnEliminar.addActionListener(e -> {
             String cod = txtCodigo.getText().trim();
-            if (cod.isEmpty()) { JOptionPane.showMessageDialog(this, "Seleccione un instructor."); return; }
-                controlador.eliminarUsuario(cod);
-                JOptionPane.showMessageDialog(this, "Instructor eliminado.");
-                cargarTablaUsuarios(modeloInstructores, "INSTRUCTOR");
-                limpiarCampos(txtCodigo, txtNombre, txtFecha, txtPass);
-            
+
+            if (cod.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Seleccione un instructor.");
+                return;
+            }
+
+            controlador.eliminarUsuario(cod);
+            Bitacora.registrar("ADMINISTRADOR", "ADMIN", "ELIMINAR INSTRUCTOR", "Instructor eliminado");
+
+            JOptionPane.showMessageDialog(this, "Instructor eliminado.");
+            cargarTablaUsuarios(modeloInstructores, "INSTRUCTOR");
+            limpiarCampos(txtCodigo, txtNombre, txtFecha, txtPass);
         });
- 
-        // ── CARGAR CSV ───────────────────────────────────────────────
+
+        // CSV
         btnCSV.addActionListener(e -> {
             String path = elegirCSV();
             if (path != null) {
                 controlador.cargarUsuariosCSV(path, "INSTRUCTOR");
+                Bitacora.registrar("ADMINISTRADOR", "ADMIN", "CARGA CSV INSTRUCTOR", "Archivo cargado");
                 cargarTablaUsuarios(modeloInstructores, "INSTRUCTOR");
             }
         });
@@ -300,11 +320,12 @@ public class PanelAdministrador extends JPanel{
             String pass = new String(txtPass.getPassword()).trim();
             if (cod.isEmpty() || nom.isEmpty() || pass.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Codigo, nombre y contraseña son obligatorios.");
+                Bitacora.registrar("ADMINISTRADOR", "ADMIN", "AGREGAR ESTUDIANTE", "Error al agregar");
                 return;
             }
-            controlador.agregarUsuario(new Usuario.Estudiante(cod, nom, pass, fec, gen));
-            
+                controlador.agregarUsuario(new Usuario.Estudiante(cod, nom, pass, fec, gen));
                 JOptionPane.showMessageDialog(this, "Estudiante registrado correctamente.");
+                Bitacora.registrar("ADMINISTRADOR", "ADMIN", "AGREGAR ESTUDIANTE", "estudiante agregado correctamente");
                 cargarTablaUsuarios(modeloEstudiantes, "ESTUDIANTE");
                 limpiarCampos(txtCodigo, txtNombre, txtFecha, txtPass);
         });
@@ -313,26 +334,32 @@ public class PanelAdministrador extends JPanel{
             String cod  = txtCodigo.getText().trim();
             String nom  = txtNombre.getText().trim();
             String pass = new String(txtPass.getPassword()).trim();
-            if (cod.isEmpty()) { JOptionPane.showMessageDialog(this, "Seleccione o ingrese un codigo."); return; }
-            controlador.actualizarUsuario(cod, nom.isEmpty() ? null : nom, pass.isEmpty() ? null : pass);
-            JOptionPane.showMessageDialog(this, "EStudiante actualizado.");
+
+            if (cod.isEmpty()) return;
+
+            controlador.actualizarUsuario(cod, nom.isEmpty()?null:nom, pass.isEmpty()?null:pass);
+            Bitacora.registrar("ADMINISTRADOR", "ADMIN", "ACTUALIZAR ESTUDIANTE", "Actualizado");
+
+            JOptionPane.showMessageDialog(this, "Estudiante actualizado.");
             cargarTablaUsuarios(modeloEstudiantes, "ESTUDIANTE");
-            
         });
- 
+
         btnEliminar.addActionListener(e -> {
             String cod = txtCodigo.getText().trim();
-            if (cod.isEmpty()) { JOptionPane.showMessageDialog(this, "Seleccione un estudiante."); return; }
-                    controlador.eliminarUsuario(cod);
-                    JOptionPane.showMessageDialog(this, "Estudiante eliminado.");
-                    cargarTablaUsuarios(modeloEstudiantes, "ESTUDIANTE");
-                    limpiarCampos(txtCodigo, txtNombre, txtFecha, txtPass);
+            if (cod.isEmpty()) return;
+
+            controlador.eliminarUsuario(cod);
+            Bitacora.registrar("ADMINISTRADOR", "ADMIN", "ELIMINAR ESTUDIANTE", "Eliminado");
+
+            JOptionPane.showMessageDialog(this, "Estudiante eliminado.");
+            cargarTablaUsuarios(modeloEstudiantes, "ESTUDIANTE");
         });
- 
+
         btnCSV.addActionListener(e -> {
             String path = elegirCSV();
             if (path != null) {
                 controlador.cargarUsuariosCSV(path, "ESTUDIANTE");
+                Bitacora.registrar("ADMINISTRADOR", "ADMIN", "CARGA CSV ESTUDIANTE", "Archivo cargado");
                 cargarTablaUsuarios(modeloEstudiantes, "ESTUDIANTE");
             }
         });
@@ -416,10 +443,11 @@ public class PanelAdministrador extends JPanel{
                 JOptionPane.showMessageDialog(this, "Los créditos deben ser un número entero.");
                 return;
             }
-                controlador.agregarCurso(new Curso(cod, nom, desc, cred, sec));
-                JOptionPane.showMessageDialog(this, "Curso registrado correctamente.");
-                cargarTablaCursos();
-                limpiarCampos(txtCodigo, txtNombre, txtDesc, txtCreditos, txtSeccion);
+             controlador.agregarCurso(new Curso(cod, nom, desc, cred, sec));
+             JOptionPane.showMessageDialog(this, "Curso registrado correctamente.");
+             Bitacora.registrar("ADMINISTRADOR", "ADMIN", "AGREGAR CURSO", "Curso agregado");
+             cargarTablaCursos();
+             limpiarCampos(txtCodigo, txtNombre, txtDesc, txtCreditos, txtSeccion);
         });
  
         btnActualizar.addActionListener(e -> {
@@ -439,6 +467,7 @@ public class PanelAdministrador extends JPanel{
             desc.isEmpty() ? null : desc,
             cred, sec.isEmpty() ? null : sec);
             JOptionPane.showMessageDialog(this, "Curso actualizado.");
+            Bitacora.registrar("ADMINISTRADOR", "ADMIN", "ACTUALIZAR CURSO", "Curso actualizado");
             cargarTablaCursos();
         });
         ///eliminar
@@ -448,6 +477,7 @@ public class PanelAdministrador extends JPanel{
             if (cod.isEmpty()) { JOptionPane.showMessageDialog(this, "Seleccione un curso."); return; }
                 controlador.eliminarCurso(cod);
                 JOptionPane.showMessageDialog(this, "curso eliminado.");
+                Bitacora.registrar("ADMINISTRADOR", "ADMIN", "ELIMINAR CURSO", "Curso eliminado");
                 cargarTablaCursos();
                 limpiarCampos(txtCodigo, txtNombre, txtDesc, txtCreditos, txtSeccion);
           
@@ -457,6 +487,7 @@ public class PanelAdministrador extends JPanel{
             String path = elegirCSV();
             if (path != null) {
                 controlador.cargarCursosCSV(path);
+                Bitacora.registrar("ADMINISTRADOR", "ADMIN", "CARGA CSV CURSOS", "Archivo cargado");
                 cargarTablaCursos();
             }
         });
@@ -562,6 +593,7 @@ public class PanelAdministrador extends JPanel{
                         ((Usuario.Instructor) u).incrementarSecciones();
                         controlador.guardarUsuarios();
                         JOptionPane.showMessageDialog(this, "Seccion registrada correctamente.");
+                        Bitacora.registrar("ADMINISTRADOR", "ADMIN", "AGREGAR SECCION", "Seccion agregada");
                         cargarTablaSecciones();
                         limpiarCampos(txtCodigo, txtCurso, txtInstructor, txtHorario, txtSemestre, txtCupos);
                     }
@@ -583,6 +615,7 @@ public class PanelAdministrador extends JPanel{
                         hor.isEmpty() ? null : hor,
                         cupos);
                     JOptionPane.showMessageDialog(this, "Seccion actualizada.");
+                    Bitacora.registrar("ADMINISTRADOR", "ADMIN", "ACTUALIZAR SECCION", "Seccion actualizada");
                     cargarTablaSecciones();
                 
         });
@@ -592,6 +625,7 @@ public class PanelAdministrador extends JPanel{
             if (cod.isEmpty()) { JOptionPane.showMessageDialog(this, "Seleccione una seccion"); return; }
                     controlador.eliminarSeccion(cod);
                     JOptionPane.showMessageDialog(this, "Seccion eliminada.");
+                    Bitacora.registrar("ADMINISTRADOR", "ADMIN", "ELIMINAR SECCION", "Seccion eliminada");
                     cargarTablaSecciones();
                     limpiarCampos(txtCodigo, txtCurso, txtInstructor, txtHorario, txtSemestre, txtCupos);
  
@@ -668,24 +702,33 @@ public class PanelAdministrador extends JPanel{
         //4
         btnInscripcionesCurso.addActionListener(e -> {
            reportes.reporteInscripcionesPorCurso();
+           Bitacora.registrar("ADMINISTRADOR", "ADMIN", "REPORTE INSCRIPCIONES CURSO", "Generado");
         });
         //5
         btnInscripcionesSem.addActionListener(e -> {
             String sem = JOptionPane.showInputDialog(this, "Ingrese el semestre (1 o 2):");
             if (sem == null || sem.trim().isEmpty()) return;
+            Bitacora.registrar("ADMINISTRADOR", "ADMIN", "REPORTE INSCRIPCIONES SEMESTRE", "Generado");
             reportes.reporteInscripcionesPorSemestre(sem.trim());
+            
         });
         //5
         btnHistorialEstudiante.addActionListener(e -> {
         String cod = JOptionPane.showInputDialog(this, "Ingrese el codigo del estudiante:");
             if (cod == null || cod.trim().isEmpty()){return;} 
             reportes.reporteIndividualEstudiante(cod);
+            Bitacora.registrar("ADMINISTRADOR", "ADMIN", "REPORTE HISTORIAL ESTUDIANTE", "Generado");
         });
 
         btnNotasSeccion.addActionListener(e -> {
            String cod = JOptionPane.showInputDialog(this, "Ingrese el codigo de la seccion:");
         if (cod == null || cod.trim().isEmpty()) return;
             reportes.reporteCalificacionesPorSeccion(cod);
+            Bitacora.registrar("ADMINISTRADOR", "ADMIN", "REPORTE NOTAS SECCION", "Generado");
+        });
+        btnReporteBitacora.addActionListener(e -> {
+            reportes.reporteBitacora();
+            Bitacora.registrar("ADMINISTRADOR", "ADMIN", "REPORTE BITACORA", "Generado");
         });
         return panel;
    }

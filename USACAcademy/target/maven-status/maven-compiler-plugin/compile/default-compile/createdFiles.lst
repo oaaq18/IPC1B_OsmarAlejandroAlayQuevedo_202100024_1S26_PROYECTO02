@@ -1,5 +1,6 @@
 usacacademy/Modelo/Usuario$Instructor.class
 usacacademy/Modelo/Usuario$Administrador.class
+usacacademy/controlador/Bitacora.class
 usacacademy/vista/PanelEstudiante$3.class
 usacacademy/vista/VistaPrincipal.class
 usacacademy/vista/PanelInstructor$3.class

@@ -9,6 +9,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+import usacacademy.controlador.Bitacora;
 import usacacademy.controlador.Reportes;
 
 public class PanelInstructor extends JPanel{
@@ -51,7 +52,12 @@ public class PanelInstructor extends JPanel{
         // boton logout abajo
         JPanel panelSur = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnLogout = new JButton("Cerrar Sesion");
-        btnLogout.addActionListener(e -> ventanaPrincipal.cambiarVista("Login"));
+        btnLogout.addActionListener(e -> {
+            if (instructorActual != null) {
+                Bitacora.registrar("INSTRUCTOR", instructorActual.getCodigo(), "CERRAR_SESION", "Sesion finalizada");
+            }
+            ventanaPrincipal.cambiarVista("Login");
+        });
         panelSur.add(btnLogout);
         add(panelSur, BorderLayout.SOUTH);
     }
@@ -92,11 +98,14 @@ public class PanelInstructor extends JPanel{
             String cod = JOptionPane.showInputDialog(this, "Ingrese el codigo de la seccion:");
             if (cod == null || cod.trim().isEmpty()) return;
             reportes.reporteCalificacionesPorSeccion(cod);
+            Bitacora.registrar("INSTRUCTOR", instructorActual.getCodigo(), "REPORTE NOTAS SECCION", "Generado");
         });
         btnReporteEstudiante.addActionListener(e -> {
             String cod = JOptionPane.showInputDialog(this, "Ingrese el codigo del estudiante:");
             if (cod == null || cod.trim().isEmpty()) return;
             reportes.reporteIndividualEstudiante(cod);
+            Bitacora.registrar("INSTRUCTOR", instructorActual.getCodigo(), "REPORTE ESTUDIANTE", "Generado");
+            
         });
 
         // panel sur que contiene ambos: tabla estudiantes arriba, boton abajo
@@ -202,6 +211,7 @@ public class PanelInstructor extends JPanel{
  
             if (cur.isEmpty() || sec.isEmpty() || est.isEmpty() || eti.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "ERROR: Todos los campos son obligatorios.");
+                Bitacora.registrar("INSTRUCTOR", instructorActual.getCodigo(), "AGREGAR NOTA", "Error datos incompletos");
                 return;
             }
             double pond = 0, nota = 0;
@@ -210,6 +220,7 @@ public class PanelInstructor extends JPanel{
                 nota = Double.parseDouble(txtNota.getText().trim());
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "ERROR: Ponderacion y nota deben ser numeros.");
+                Bitacora.registrar("INSTRUCTOR", instructorActual.getCodigo(), "AGREGAR NOTA", "Error formato numerico");
                 return;
             }
                 controlador.agregarNota(new Nota(cur, sec, est, eti, pond, nota, fecha),
@@ -217,6 +228,7 @@ public class PanelInstructor extends JPanel{
             );
          
                 JOptionPane.showMessageDialog(this, "Nota registrada correctamente.");
+                Bitacora.registrar("INSTRUCTOR", instructorActual.getCodigo(), "AGREGAR NOTA", "Nota agregada correctamente");
                 cargarTablaNotas();
                 limpiarCampos(txtCurso, txtSeccion, txtEstudiante, txtEtiqueta, txtPonderacion, txtNota, txtFecha);
             
@@ -237,10 +249,12 @@ public class PanelInstructor extends JPanel{
                 nota = Double.parseDouble(txtNota.getText().trim());
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "ERROR: Ponderacion y nota deben ser numeros.");
+                Bitacora.registrar("INSTRUCTOR", instructorActual.getCodigo(), "ACTUALIZAR NOTA", "Error datos incompletos");
                 return;
             }
                 controlador.actualizarNota(sec, est, eti, pond, nota);
                 JOptionPane.showMessageDialog(this, "Nota actualizada.");
+                Bitacora.registrar("INSTRUCTOR", instructorActual.getCodigo(), "ACTUALIZAR NOTA", "Nota actualizada");
                 cargarTablaNotas();
             
         });
@@ -252,10 +266,13 @@ public class PanelInstructor extends JPanel{
             String eti = txtEtiqueta.getText().trim();
             if (sec.isEmpty() || est.isEmpty() || eti.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Seleccione una nota de la tabla.");
+                Bitacora.registrar("INSTRUCTOR", instructorActual.getCodigo(), "ELIMINAR NOTA", "Error datos incompletos");
                 return;
+                
             }
             controlador.eliminarNota(sec, est, eti);
             JOptionPane.showMessageDialog(this, "Nota eliminada.");
+            Bitacora.registrar("INSTRUCTOR", instructorActual.getCodigo(), "ELIMINAR NOTA", "Nota eliminada");
             cargarTablaNotas();
             limpiarCampos(txtCurso, txtSeccion, txtEstudiante, txtEtiqueta, txtPonderacion, txtNota, txtFecha);
             
@@ -267,6 +284,7 @@ public class PanelInstructor extends JPanel{
             String path = elegirCSV();
             if (path != null) {
                 controlador.cargarNotasCSV(path, instructorActual.getCodigo());
+                Bitacora.registrar("INSTRUCTOR", instructorActual.getCodigo(), "CARGA CSV NOTAS", "Archivo cargado");
                 cargarTablaNotas();
             }
         });
@@ -324,8 +342,9 @@ public class PanelInstructor extends JPanel{
                 n.getFecha(), String.format("%.2f", promedio), estado
             });
         }
+        
     }
- 
+   
  
     private String elegirCSV() {
         JFileChooser fc = new JFileChooser();

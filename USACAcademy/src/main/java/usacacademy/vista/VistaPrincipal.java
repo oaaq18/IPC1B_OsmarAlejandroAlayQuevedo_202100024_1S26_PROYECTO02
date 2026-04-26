@@ -4,6 +4,7 @@ import java.awt.CardLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import usacacademy.controlador.AppControlador;
+import usacacademy.controlador.Bitacora;
 
 
 public class VistaPrincipal extends JFrame{
@@ -38,13 +39,16 @@ public class VistaPrincipal extends JFrame{
         public void cambiarVista(String nombreVista) {
         cardLayout.show(panelPrincipal, nombreVista);
         if ("Administrador".equals(nombreVista)) {
+            Bitacora.registrar("ADMINISTRADOR", "admin", "LOGIN", "Inicio de sesion exitoso");
             panelAdministrador.iniciarHilos();
         }
         if ("Instructor".equals(nombreVista)) {
             // le pasa el instructor que inicio sesion
             panelInstructor.setInstructor((Usuario.Instructor) usuarioActual);
+            Bitacora.registrar("INSTRUCTOR", usuarioActual.getCodigo(), "LOGIN", "Inicio de sesion exitoso");
         }
         if("Estudiante".equals(nombreVista)){
+            Bitacora.registrar("ESTUDIANTE", usuarioActual.getCodigo(), "LOGIN", "Inicio de sesion exitoso");
             panelEstudiante.setEstudiante((Usuario.Estudiante)usuarioActual);
         }
     }

@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import usacacademy.controlador.Bitacora;
 
 public class PanelLogin extends JPanel{
     private JTextField usuario;
@@ -67,6 +68,7 @@ public class PanelLogin extends JPanel{
         if(usuario instanceof Usuario.Administrador) {
             JOptionPane.showMessageDialog(this, "Ingresando como administrador");
             ventanaPrincipal.cambiarVista("Administrador");
+            
         }else if (usuario instanceof Usuario.Instructor){
             JOptionPane.showMessageDialog(this, "Ingresando como instructor");
             ventanaPrincipal.setUsuarioActual(usuario);
@@ -80,6 +82,7 @@ public class PanelLogin extends JPanel{
         }else {
             //manejo de errores visuales
             JOptionPane.showMessageDialog(this, "Codigo o contraseña incorrectos");
+            Bitacora.registrar("DESCONOCIDO", "null", "LOGIN", "Credenciales incorrectas");
         }
     }
     
