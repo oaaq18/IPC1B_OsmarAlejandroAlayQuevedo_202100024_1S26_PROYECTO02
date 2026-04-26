@@ -41,8 +41,8 @@ public class Reportes {
     }
     
     //------------------------------REPORTES PDF-------------------------------------------------
-     private void generarPDF(String titulo, String[] encabezados, listaSimple<String[]> filas) {
-        String nombreArchivo = generarNombre("Reporte", "pdf");
+     private void generarPDF(String titulo, String[] encabezados, listaSimple<String[]> filas, String NombreArchivo) {
+        String nombreArchivo = generarNombre(NombreArchivo+"PDF", "pdf");
         Document doc = new Document();
         
         try {
@@ -80,9 +80,9 @@ public class Reportes {
     }
      //GENERAR CSV
       // metodo base para crear un CSV
-    private void generarCSV(String[] encabezados, listaSimple<String[]> filas) {
+    private void generarCSV(String[] encabezados, listaSimple<String[]> filas, String NombreArchivo) {
       // genera el nombre con la fecha, se guarda donde corren los .ser
-      String nombreArchivo = generarNombre("REPORTE", "csv");
+      String nombreArchivo = generarNombre(NombreArchivo+"CSV", "csv");
       try (PrintWriter pw = new PrintWriter(new FileWriter(nombreArchivo))) {
           pw.println(String.join(",", encabezados));
           for (int i = 0; i < filas.size(); i++) {
@@ -92,9 +92,9 @@ public class Reportes {
       } catch (Exception e) {
           JOptionPane.showMessageDialog(null, "Error al generar CSV: " + e.getMessage());
       }
-  }
+    }
     
-     //EStudiente individual: 
+     //-------------------------Reporte por estudiante-------------------------- 
        public void reporteIndividualEstudiante(String codEstudiante) {
         String tipo = "ReporteEstudiante_" + codEstudiante;
  
@@ -120,10 +120,125 @@ public class Reportes {
         }
  
        String titulo = "Reporte Individual: " + u.getNombre() + " (" + codEstudiante + ")";
-       generarPDF(titulo, encabezados, filas);
-       generarCSV(encabezados, filas);
+       generarPDF(titulo, encabezados, filas,"REPORTE_INDIVIDUAL");
+       generarCSV(encabezados, filas,"REPORTE_INDIVIDUAL");
     }
+    //------------------------INSCRIPCIONES POR CURSO---------------------
+    public void reporteInscripcionesPorCurso() {
+        String tipo = "InscripcionesPorCurso";
+
+        String[] encabezados = {"Curso", "Nombre Curso", "Secciones Abiertas", "Total Inscritos"};
+        listaSimple<String[]> filas = new listaSimple<>();
  
-     
+        listaSimple<Curso>    cursos    = controlador.getCursos();
+        listaSimple<Seccion>  secciones = controlador.getSEcciones();
+ 
+        for (int i = 0; i < cursos.size(); i++) {
+            Curso cur = cursos.obtener(i);
+            int seccionesAbiertas = 0;
+            int totalInscritos    = 0;
+ 
+            for (int j = 0; j < secciones.size(); j++) {
+                Seccion sec = secciones.obtener(j);
+                if (!sec.getCodigoCurso().equals(cur.getCodigo())) continue;
+                if (sec.getEstado().equals("ABIERTA")) seccionesAbiertas++;
+                totalInscritos += sec.getEstudiantesInscritos().size();
+            }
+ 
+            filas.agregar(new String[]{
+                cur.getCodigo(), cur.getNombre(),
+                String.valueOf(seccionesAbiertas),
+                String.valueOf(totalInscritos)
+            });
+        }
+ 
+        generarPDF("Reporte: Inscripciones por Curso", encabezados, filas,"REPORTEINSPORCURSO");
+        generarCSV(encabezados, filas,"REPORTEINSPORCURSO");
+    }  
+    
+    //--------------CALIFICACIONES POR SECCION
+      public void reporteCalificacionesPorSeccion(String codSeccion) {
+
+        Seccion sec = controlador.buscarSeccion(codSeccion);
+        if (sec == null) {
+            JOptionPane.showMessageDialog(null, "Seccion no encontrada.");
+            return;
+        }
+ 
+        String[] encabezados = {"Estudiante", "Nombre", "Etiqueta", "Ponderacion", "Nota", "Fecha", "Promedio", "Estado"};
+        listaSimple<String[]> filas = new listaSimple<>();
+ 
+        listaSimple<Nota> notas = controlador.getNotas();
+        for (int i = 0; i < notas.size(); i++) {
+            Nota n = notas.obtener(i);
+            if (!n.getCodigoSeccion().equals(codSeccion)) continue;
+            Usuario u = controlador.buscarUsuario(n.getCodigoEstudiante());
+            String nombre = (u != null) ? u.getNombre() : "Desconocido";
+            double prom   = controlador.calcularPromedio(codSeccion, n.getCodigoEstudiante());
+            String estado = prom >= 61 ? "Aprobado" : "Reprobado";
+            filas.agregar(new String[]{
+                n.getCodigoEstudiante(), nombre, n.getEtiqueta(),
+                String.valueOf(n.getPonderacion()), String.valueOf(n.getValor()),
+                n.getFecha(), String.format("%.2f", prom), estado
+            });
+        }
+ 
+        String titulo = "Reporte Calificaciones Seccion: " + codSeccion;
+        generarPDF(titulo, encabezados, filas, "CALIFICACIONESPORSECCION");
+        generarCSV(encabezados, filas, "CALIFICACIONESPORSECCION");
+    }
+      
+     public void reporteInscripcionesPorSemestre(String semestre) {
+    String[] encabezados = {"Curso", "Nombre Curso", "Seccion", "Instructor", "Total Inscritos"};
+    listaSimple<String[]> filas = new listaSimple<>();
+
+    listaSimple<Seccion> secciones = controlador.getSEcciones();
+    for (int i = 0; i < secciones.size(); i++) {
+        Seccion sec = secciones.obtener(i);
+        // filtrar solo las secciones del semestre indicado
+        if (!sec.getSemestre().equals(semestre)) continue;
+
+        Curso cur = controlador.buscarCurso(sec.getCodigoCurso());
+        String nombreCurso = (cur != null) ? cur.getNombre() : "Desconocido";
+
+        Usuario ins = controlador.buscarUsuario(sec.getCodigoInstructor());
+        String nombreIns = (ins != null) ? ins.getNombre() : "Sin instructor";
+
+        filas.agregar(new String[]{
+            sec.getCodigoCurso(), nombreCurso, sec.getCodigo(),
+            nombreIns, String.valueOf(sec.getEstudiantesInscritos().size())
+        });
+    }
+
+    String titulo = "Reporte Inscripciones Semestre: " + semestre;
+    generarPDF(titulo, encabezados, filas, "CALIFICACIONESPORSEMESTRE");
+    generarCSV(encabezados, filas,"CALIFICACIONESPORSECCION");
+}
+     //--------------------------ESTUDIANTE POR SEMESTRE (PARA USO DE ESTUDIANTE)--------
+    public void reporteEstudiantePorSemestre(String codEstudiante, String semestre) {
+        Usuario u = controlador.buscarUsuario(codEstudiante);
+        String nombre=u.getNombre();
+        
+        if (u == null) return;
+        String[] encabezados = {"Seccion", "Curso", "Semestre", "Promedio", "Estado"};
+        listaSimple<String[]> filas = new listaSimple<>();
+        listaSimple<Seccion> secciones = controlador.getSEcciones();
+        for (int i = 0; i < secciones.size(); i++) {
+            Seccion sec = secciones.obtener(i);
+            // filtrar por estudiante y semestre
+            if (!sec.estaInscrito(codEstudiante)) continue;
+            if (!sec.getSemestre().equals(semestre)) continue;
+            double prom   = controlador.calcularPromedio(sec.getCodigo(), codEstudiante);
+            String estado = prom >= 61 ? "Aprobado" : "Reprobado";
+            filas.agregar(new String[]{
+                sec.getCodigo(), sec.getCodigoCurso(),
+                sec.getSemestre(), String.format("%.2f", prom), estado
+            });
+        }
+
+        String titulo = "Historial Semestre " + semestre + ": " + u.getNombre();
+        generarPDF(titulo, encabezados, filas, nombre+"REPORTE");
+        generarCSV(encabezados, filas,nombre+"REPORTE");
+    }
      
 }

@@ -10,12 +10,13 @@ import usacacademy.Modelo.Seccion;
 import usacacademy.Modelo.Usuario;
 import usacacademy.Modelo.listaSimple;
 import usacacademy.controlador.AppControlador;
+import usacacademy.controlador.Reportes;
 
 public class PanelEstudiante extends JPanel{
     private VistaPrincipal ventanaPrincipal; 
     private AppControlador controlador; 
     private Usuario.Estudiante estudianteActual; // estudiante que inicio sesion
-    
+    private Reportes reportes;
     //tablas
     private JTable tablaDisponibles, tablaMisInscripciones, tablaNotas;
     private DefaultTableModel modeloDisponibles, modeloMisInscripciones, modeloNotas;
@@ -31,6 +32,7 @@ public class PanelEstudiante extends JPanel{
     
     public void setEstudiante(Usuario.Estudiante estudiante) {
         this.estudianteActual = estudiante;
+        this.reportes = new Reportes(controlador);
         // recargar todas las tablas con los datos del estudiante actual
         cargarTablaDisponibles();
         cargarTablaMisInscripciones();
@@ -196,6 +198,28 @@ public class PanelEstudiante extends JPanel{
         modeloNotas = new DefaultTableModel(cols, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
+        // botones de exportar
+        JPanel botones = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        JButton btnRefrescar        = new JButton("Refrescar");
+        JButton btnExportarCompleto = new JButton("Exportar Historial Completo");
+        JButton btnExportarSemestre = new JButton("Exportar por Semestre");
+        botones.add(btnRefrescar);
+        botones.add(btnExportarCompleto);
+        botones.add(btnExportarSemestre);
+        
+        btnRefrescar.addActionListener(e -> cargarTablaNotas());
+        btnExportarCompleto.addActionListener(e -> {
+            if (estudianteActual == null) return;
+            reportes.reporteIndividualEstudiante(estudianteActual.getCodigo());
+        });
+        
+        btnExportarSemestre.addActionListener(e -> {
+            if (estudianteActual == null) return;
+                String sem = JOptionPane.showInputDialog(this, "Ingrese el semestre (1 o 2):");
+            if (sem == null || sem.trim().isEmpty()) return;
+             reportes.reporteEstudiantePorSemestre(estudianteActual.getCodigo(), sem.trim());
+        });
+        panel.add(botones, BorderLayout.SOUTH);
         tablaNotas = new JTable(modeloNotas);
         tablaNotas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         panel.add(new JScrollPane(tablaNotas), BorderLayout.CENTER);

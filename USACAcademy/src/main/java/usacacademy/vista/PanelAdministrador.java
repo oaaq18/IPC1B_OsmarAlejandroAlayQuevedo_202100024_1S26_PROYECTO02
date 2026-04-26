@@ -552,6 +552,7 @@ public class PanelAdministrador extends JPanel{
                 JOptionPane.showMessageDialog(this, "EEROR: los cupos deben ser un numero entero");
                 return;
             }
+     
             controlador.agregarSeccion(new Seccion(cod, cur, ins, hor, sem, cupos, null));
             
                 // Incrementar secciones del instructor si fue asignado
@@ -560,10 +561,10 @@ public class PanelAdministrador extends JPanel{
                     if (u instanceof Usuario.Instructor) {
                         ((Usuario.Instructor) u).incrementarSecciones();
                         controlador.guardarUsuarios();
+                        JOptionPane.showMessageDialog(this, "Seccion registrada correctamente.");
+                        cargarTablaSecciones();
+                        limpiarCampos(txtCodigo, txtCurso, txtInstructor, txtHorario, txtSemestre, txtCupos);
                     }
-                JOptionPane.showMessageDialog(this, "Seccion registrada correctamente.");
-                cargarTablaSecciones();
-                limpiarCampos(txtCodigo, txtCurso, txtInstructor, txtHorario, txtSemestre, txtCupos);
             }
         });
  
@@ -604,7 +605,7 @@ public class PanelAdministrador extends JPanel{
         return panel;
     }
     //----------------------------------------------HILOS-----------------------------------
-   private JPanel crearTabMonitor() {
+    private JPanel crearTabMonitor() {
         JPanel panel = new JPanel(new BorderLayout());
 
         txtConsola = new JTextArea();
@@ -619,7 +620,7 @@ public class PanelAdministrador extends JPanel{
         return panel;
     }
    //------------------------REPORTES
-   private JPanel reportes(){
+    private JPanel reportes(){
             Reportes reportes = new Reportes(controlador);
          JPanel panel = new JPanel(new BorderLayout(6, 6));
          panel.setBorder(new EmptyBorder(8, 8, 8, 8));
@@ -627,13 +628,13 @@ public class PanelAdministrador extends JPanel{
         // ===== PANEL REPORTES =====
         JPanel botonesReportes = new JPanel(new GridLayout(2, 2, 10, 10));
 
-        JButton btnTopEstudiantes       = new JButton("Top estudiantes");
-        JButton btnBajoRendimiento      = new JButton("Bajo rendimiento");
-        JButton btnRendimientoSecciones = new JButton("Rendimiento por seccion");
+        JButton btnTopEstudiantes       = new JButton("Top estudiantes(Sin implementar)");
+        JButton btnBajoRendimiento      = new JButton("Bajo rendimiento(Sin implementar)");
+        JButton btnRendimientoSecciones = new JButton("Rendimiento por seccion(Sin implementar)");
         JButton btnInscripcionesCurso   = new JButton("Inscripciones por curso");
         JButton btnInscripcionesSem     = new JButton("Inscripciones por Semestre");
         JButton btnHistorialEstudiante  = new JButton("Historial de estudiante");
-        JButton btnNotasSeccion         = new JButton("Notas por sección");
+        JButton btnNotasSeccion         = new JButton("Notas por seccion");
         JButton btnReporteBitacora      = new JButton("Reporte bitacora");
 
          // agregar al panel de reportes
@@ -646,42 +647,35 @@ public class PanelAdministrador extends JPanel{
         botonesReportes.add(btnNotasSeccion);
         botonesReportes.add(btnReporteBitacora);
 
-         // ===== PANEL EXPORTACIONES =====
-        JPanel botonesExportaciones = new JPanel(new GridLayout(2, 2, 10, 10));
-
-        JButton btnExportarPDF = new JButton("Exportar PDF");
-        JButton btnExportarCSV = new JButton("Exportar CSV");
-        // agregar al panel de exportaciones
-        botonesExportaciones.add(btnExportarPDF);
-        botonesExportaciones.add(btnExportarCSV);
-
         // ===== AGREGAR AL PANEL PRINCIPAL =====
         panel.add(botonesReportes, BorderLayout.CENTER);
-        panel.add(botonesExportaciones, BorderLayout.SOUTH);
+
         
         //LISTENERS DE LOS BOTONES:
   
-        
+        //1
         btnTopEstudiantes.addActionListener(e -> {
  
         });
-
+        //2
         btnBajoRendimiento.addActionListener(e -> {
             
         });
-
+        //3
         btnRendimientoSecciones.addActionListener(e -> {
             
         });
-
+        //4
         btnInscripcionesCurso.addActionListener(e -> {
-           
+           reportes.reporteInscripcionesPorCurso();
         });
-
+        //5
         btnInscripcionesSem.addActionListener(e -> {
-            
+            String sem = JOptionPane.showInputDialog(this, "Ingrese el semestre (1 o 2):");
+            if (sem == null || sem.trim().isEmpty()) return;
+            reportes.reporteInscripcionesPorSemestre(sem.trim());
         });
-
+        //5
         btnHistorialEstudiante.addActionListener(e -> {
         String cod = JOptionPane.showInputDialog(this, "Ingrese el codigo del estudiante:");
             if (cod == null || cod.trim().isEmpty()){return;} 
@@ -689,7 +683,9 @@ public class PanelAdministrador extends JPanel{
         });
 
         btnNotasSeccion.addActionListener(e -> {
-           
+           String cod = JOptionPane.showInputDialog(this, "Ingrese el codigo de la seccion:");
+        if (cod == null || cod.trim().isEmpty()) return;
+            reportes.reporteCalificacionesPorSeccion(cod);
         });
         return panel;
    }

@@ -302,6 +302,7 @@ public class AppControlador {
         if (buscarCurso(seccion.getCodigo())!=null) {
             JOptionPane.showMessageDialog(null, "ERROR: El codigo de seccion "+seccion.getCodigo() + " ya exixte");
             return false;
+            
         }
         //CASO VERDADERO, CODIGO DISPONIBLE
         secciones.agregar(seccion);

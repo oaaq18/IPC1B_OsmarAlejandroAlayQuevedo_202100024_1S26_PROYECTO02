@@ -9,8 +9,10 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+import usacacademy.controlador.Reportes;
 
 public class PanelInstructor extends JPanel{
+    private Reportes reportes;
     private VistaPrincipal ventanaPrincipal;
     private AppControlador controlador;
     private Usuario.Instructor instructorActual; // quien inicio sesion
@@ -29,6 +31,7 @@ public class PanelInstructor extends JPanel{
     // para saber que instructor inicio sesion
     public void setInstructor(Usuario.Instructor instructor) {
         this.instructorActual = instructor;
+        this.reportes = new Reportes(controlador);
         cargarTablaSecciones();
         cargarTablaNotas();
     }
@@ -58,8 +61,8 @@ public class PanelInstructor extends JPanel{
     private JPanel pestanaSecciones() {
         JPanel panel = new JPanel(new BorderLayout(6, 6));
         panel.setBorder(new EmptyBorder(8, 8, 8, 8));
- 
-        // tabla de secciones asignadas al instructor
+
+        // tabla de secciones
         String[] cols = {"Codigo Seccion", "Codigo Curso", "Horario", "Semestre", "Cupos", "Estado"};
         modeloSecciones = new DefaultTableModel(cols, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
@@ -67,20 +70,41 @@ public class PanelInstructor extends JPanel{
         tablaSecciones = new JTable(modeloSecciones);
         tablaSecciones.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         panel.add(new JScrollPane(tablaSecciones), BorderLayout.CENTER);
- 
-        // tabla de estudiantes de la seccion seleccionada
+
+        // tabla de estudiantes
         String[] colsEst = {"Codigo Estudiante", "Nombre", "Promedio", "Estado"};
         DefaultTableModel modeloEstudiantes = new DefaultTableModel(colsEst, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
         JTable tablaEstudiantes = new JTable(modeloEstudiantes);
- 
         JPanel panelEst = new JPanel(new BorderLayout());
         panelEst.setBorder(BorderFactory.createTitledBorder("Estudiantes de la seccion seleccionada"));
         panelEst.add(new JScrollPane(tablaEstudiantes), BorderLayout.CENTER);
-        panelEst.setPreferredSize(new Dimension(0, 180));
-        panel.add(panelEst, BorderLayout.SOUTH);
- 
+        panelEst.setPreferredSize(new Dimension(0, 150));
+
+        // boton reporte
+        JPanel botonesReportes = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JButton btnNotasSeccion = new JButton("Reporte Notas por Seccion");
+        JButton btnReporteEstudiante = new JButton("Reporte por Estudiante");
+        botonesReportes.add(btnNotasSeccion);
+        botonesReportes.add(btnReporteEstudiante);
+        btnNotasSeccion.addActionListener(e -> {
+            String cod = JOptionPane.showInputDialog(this, "Ingrese el codigo de la seccion:");
+            if (cod == null || cod.trim().isEmpty()) return;
+            reportes.reporteCalificacionesPorSeccion(cod);
+        });
+        btnReporteEstudiante.addActionListener(e -> {
+            String cod = JOptionPane.showInputDialog(this, "Ingrese el codigo del estudiante:");
+            if (cod == null || cod.trim().isEmpty()) return;
+            reportes.reporteIndividualEstudiante(cod);
+        });
+
+        // panel sur que contiene ambos: tabla estudiantes arriba, boton abajo
+        JPanel panelSur = new JPanel(new BorderLayout());
+        panelSur.add(panelEst,        BorderLayout.CENTER);
+        panelSur.add(botonesReportes, BorderLayout.SOUTH);
+
+        panel.add(panelSur, BorderLayout.SOUTH);
         // al seleccionar una seccion, mostrar sus estudiantes
         tablaSecciones.getSelectionModel().addListSelectionListener(e -> {
             int fila = tablaSecciones.getSelectedRow();
